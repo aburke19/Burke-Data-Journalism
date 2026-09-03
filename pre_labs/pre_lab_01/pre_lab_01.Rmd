@@ -1,0 +1,271 @@
+---
+title: "pre_lab_01.Rmd"
+author: "Derek Willis, Adapted by Aidan Hughes"
+date: "2026-08-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen=999)
+```
+
+## About this notebook
+
+This notebook contains code and explanatory text that you should review and run as you read through chapters 1 - 5 of the course textbook, "Data Journalism with R and the Tidyverse". Answer questions and edit the document as directed.
+
+Running this notebook will help you understand key data analysis methods and concepts that you will put into practice during this week's lab. When you come across a new command or verb in R, you should add it to your class reference notebook file along with what it's used for.
+
+When you are finished running the code in this notebook, you will push changes to your course GitHub repo, and upload the link to ELMS as instructed.
+
+You also should update your class reference notebook with code examples and what they mean. When you come across a new concept or R verb, put it in your reference notebook along with a sentence about what it does. For example:
+
+```{r}
+library(tidyverse)
+```
+
+The library function loads an R library such as the tidyverse, providing access to the verbs and functions that library contains. You have to load a library before you can use its functions.
+
+## Chapter 3
+
+### Task 1: The console
+
+**Task** In the console (look below), type 2+2 and hit enter. What does it return? Type your answer below. **Answer:**
+
+### Task 2: Variables
+
+**Task** Put the following code -- which stores the numeral 2 as a variable called number -- in the console and hit enter.
+
+```{r}
+banana <- 2
+```
+
+Then type this code to multiply the variable called number by itself.
+
+```{r}
+number * number
+```
+
+What does it return? Type your answer below:
+
+**Answer:**
+# table in right side
+
+### Task 3: Install packages
+
+**Task** In the console, run the following code to install the Tidyverse:
+
+```{r}
+install.packages('tidyverse')
+```
+
+**Task**
+
+Then run the following code to install the rmarkdown library
+
+```{r}
+install.packages('rmarkdown')
+```
+
+## Chapter 6
+
+### Task 1: Load libraries
+
+**Task** Run the following code in the gray-colored codeblock below -- not in the console -- to load the tidyverse library. To run the code, click the little green play button at the top right of the codeblock. In Rmarkdown data notebooks, we write code inside of codeblocks, and explanatory text in the white area outside of it.
+
+```{r}
+# This is a comment inside of a codeblock. Comments doesn't run when we run the codeblock.
+# Adding this is a good way to start your class reference notebook.
+library(tidyverse)
+```
+
+### Task 2: Load data
+
+**Task** Load the Maryland WinRed contributions dataset by running the following codeblock.
+
+```{r}
+maryland_winred_contributions <- read_rds("pre_lab_01.rds")
+```
+
+Once it loads, look at the environment window at right in RStudio for maryland_winred_contributions. It's next to a small blue circle with a white arrow in it. To the right of that, look at how many "obs" the dataset has ("obs" is short for observation, which is another way of saying rows or records). Look at how many variables it has (another way of saying columns or fields). Write the number of observations and variables below.
+
+**Answer**
+
+### Task 3: Glimpse data
+
+**Task** Run the following codeblock to use glimpse() to get a sense of the data, some of the values in each field/variable/column, and the data types of each field/variable/column.
+
+```{r}
+glimpse(maryland_winred_contributions)
+```
+
+In the space below, write the data type for the "last_name" column and the "amount" columns (it's in light gray, offset by \< \>). Also offer your best guess as to what the "last_name" column and the "amount" column represent.
+
+**Answer**
+last_name is a chr column / data type.
+
+
+### Task 4: Examine data "head"
+
+**Task** Run the following codeblock to use head() to examine the first six rows of data. Explore the data by clicking the black arrow on the right side of the output table, allowing you to examine additional columns.
+
+```{r}
+head(maryland_winred_contributions)
+```
+
+In the space below, write the first and last name from the _second_ row of the data. **Answer**
+Peggy Mukai
+
+### Task 5: Explore data with interactive dataframe
+
+**Task** look at the environment window at right in RStudio for maryland_winred_contributions It's next to a small blue circle with a white arrow in it. Click on the maryland_winred_contributions -- not the blue circle. It will open the dataframe as an interactive table. Scroll down to see additional rows. Scroll left to see additional columns. Click on a column name to sort by that column.
+
+### Task 6: Group and count
+
+**Task** Run the following codeblock:
+
+```{r}
+
+# say the name of our data set and then tell R that we are going to do SOMETHING to/with it
+maryland_winred_contributions |> 
+# group together all the identical values in the data column, and then do SOMETHING else with the data
+  group_by(date) |>
+# let's do SOMETHING with those groupings:
+  summarise(
+    # create a new column called count_contribs that equals the number of rows that have the same date value
+    count_contribs = n()
+  )
+```
+
+Describe what you think this code is doing below. What does the answer represent, compared to the results from `head()`? 
+# the code is representing the amount of contributions/donations given on certain dates
+
+**Answer**
+
+### Task 7: Adding arrange()
+
+**Task** Run the following codeblock:
+
+```{r}
+maryland_winred_contributions |>
+  group_by(date) |>
+  summarise(
+    count_contribs = n()
+  ) |>
+  # arranging the data in descending order (largest to smallest) by the values in count_contribs
+  arrange(desc(count_contribs))
+```
+
+Compared to the previous codeblock, what has changed and how did that affect the result?
+
+**Answer**
+# arranging the data in descending order (largest to smallest) by the values in count_contribs
+
+### Task 8: Multiple grouping
+
+**Task** Run the following codeblock.
+
+```{r}
+maryland_winred_contributions |>
+  group_by(memo_text, amount) |>
+  summarise(
+    count_contribs = n()
+  ) |>
+  arrange(desc(count_contribs))
+```
+
+Compared to the previous codeblock, what has changed and how did that affect the result?
+
+**Answer**
+
+### Task 9
+
+**Task** Run the following codeblock:
+
+```{r}
+maryland_winred_contributions |>
+  group_by(memo_text) |>
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount)
+  ) |>
+  arrange(desc(total_amount))
+```
+
+Compared to the previous codeblock, what has changed and how did that affect the result? 
+
+**Answer**
+# summarizing how many rows/donations were made to campaign committee, total sum given to committee, for each comittee we know how much contributions were made/what the total $ amount is
+
+### Task 10: More descriptive statistics
+
+**Task** Run the following codeblock to group the maryland_winred_contributions dataframe by the recipient for each contribution. Then do the following summarizations for each group:count the number of contributions, add up the value of all contributions, and calculate the mean and median contribution amounts. Then sort so the recipient with the most contributions is listed first.
+
+```{r}
+maryland_winred_contributions |>
+  group_by(memo_text) |>
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount)
+  ) |>
+  arrange(desc(count_contribs))
+```
+
+Compared to the previous codeblock, what has changed and how did that affect the result? Glancing at the names, which of the top results from Maryland?
+
+**Answer**
+# mean and median amounts donated, average amounts of donations 
+
+### Task 11
+
+**Task** Run the following codeblock to group the maryland_winred_contributions dataframe by the city for each contribution. Then do the following summarizations for each group:count the number of contributions, add up the value of all contributions, calculate the mean and median contributions amounts and calculate the smallest and largest contributions Then sort so the city with the largest total contribution amount is listed first.
+
+```{r}
+maryland_winred_contributions |>
+  group_by(city) |>
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) |>
+  arrange(desc(total_amount))
+```
+
+Compared to the previous codeblock, what has changed and how did that affect the result? How is the data sorted? **Answer**
+# organizing by cities and total amount, how many contributions (max,min,etc.) were made in each city
+
+
+### Final note
+
+Remember how we saved a single number, and then a data set, inside variables that we named? Well, we can also do that with the results of the analysis we were doing above.
+
+Let's take all the code we just ran, and store the results inside the new variable maryland_contribs_summarized
+
+```{r}
+maryland_contribs_summarized <- maryland_winred_contributions |>
+  group_by(city) |>
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) |>
+  arrange(desc(total_amount))
+```
+
+Unlike last time, we don't see the results of our code right away when we save the output in a variable.
+
+What happens when we just run the name of the variable, though?
+
+```{r}
+maryland_contribs_summarized
+```
+
+
