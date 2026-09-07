@@ -1,0 +1,120 @@
+---
+title: "lab_01"
+author: "Derek Willis, adapted by Aidan Hughes"
+date: "2026-08-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Turn off scientific notation
+options(scipen=999)
+```
+
+## About this lab
+
+To complete this lab, you need to: \* run existing code as directed (look for **Task**). \* modify existing code as directed (look for **Task**). \* write code in empty codeblocks provided to answer questions included (look for **Q**). \* write out the answer in the form of a complete sentence in the space given (look for **A**). When you are finished, commit changes and push to your personal GitHub repo, then submit the URL to this document on ELMS.
+
+Remember to add any new verbs or concepts to your reference notebook!
+
+## Load libraries and establish settings
+
+**Task** Run the codeblock below to load the Tidyverse. To run the codeblock, hit the little green play button in the upper right corner of the gray area (the codeblock) below.
+
+```{r}
+# Load the tidyverse. If you have not installed the tidyverse already, remove the # from the next line and run it first.  
+# install.packages('tidyverse')
+library(tidyverse)
+```
+
+## Load Data
+
+We're going to load the slice of WinRed contribution data from West Virginia, which is in a file called `lab_01.rds`
+
+**Task** Using the example from the pre_lab, write code to load the RDS file and assign it to a good variable name.
+
+```{r}
+wv_contributions <- read_rds("lab_01.rds")
+```
+
+## Examine Data
+
+**Task** Run the codeblock below to use glimpse to get a sense of the column names, types and sample data.
+
+```{r}
+# put the name of your data set, which you named in the last step, inside the () below
+glimpse(wv_contributions)
+```
+
+
+**Q1** How many rows and columns does this dataframe have?
+
+
+**A1** Rows: 40,441
+Columns: 24
+
+
+## Answer questions
+
+**Q2** Which West Virginia city provided the largest number of contributions? How many?
+
+Hint: you'll need to use group_by() |> summarise() here. What column are we grouping by? Then, what should go inside the summarise() part? Then, rather than clicking through the 500+ cities to find the largest one, use the same function we used in our pre-lab to sort the data from largest number to the smallest.
+
+**A2** Charleston: 3226
+
+```{r}
+wv_contributions |>
+  group_by(city) |>
+  summarise(contributions = n()) |>
+  arrange(desc(contributions))
+```
+
+**Q3** Which West Virginia cities accounted for the fewest contributions? You don't have to name all of them, but list a few. How many of those cities are there, roughly speaking?
+
+**A3** Allen Junction, Alum Bridge, Bridgeport, etc.: 1
+
+```{r}
+wv_contributions |>
+  group_by(city) |>
+  summarise(contributions = n()) |>
+  arrange(contributions)
+```
+
+**Q4** What's your best educated guess to explain why the city identified in question 2 had more contributions compared to the cities identified in question 3? Hint: you won't find the answer in the data, you'll need to do some quick web research. You do not need to write any code for this question, so no codeblock is provided.
+
+**A4** My guess: larger cities tend to have people that donate more money, the higher the population and the wealth there is, the more donations there would be.
+
+**Q5** What recipient got the largest total amount of money? How many contributions did it receive? And what was the average donation it received?
+
+Hint: Since there three distinct questions here, you'll need to do multiple things inside summarise() this time.
+
+Hint 2: "aggregate_amount" is NOT the column you want to use here.
+
+**A5** C00694323 got 40441 donations and the average donation is 25.12481
+
+```{r}
+wv_contributions |>
+  group_by(fec_committee_id) |>
+  summarise(
+    contributions = n(),
+    total_amount = sum(amount),
+    average_donation = mean(amount)
+  ) |>
+  arrange(desc(total_amount))
+```
+
+**Q6** What is that top recipient and what explains its popularity? Hint: this will require web research, you won't be able to answer this purely from the data set. You do not need to write any code for this question, so no codeblock is provided.
+
+**A6** According to Google: Joe Manchin III’s campaign for West Virginia was the top political donation recipient in the state during the first quarter of 2023, receiving $223,635 in contributions from donors in Charleston
+
+**BONUS POINTS (do this last / only if you have time at the end)** you might notice that a lot of the top recipient committees seem to be tied to the same person, and some even have nearly-identical committee names. What might be going on here? (You don't need to get this RIGHT, just give me an educated guess or two.)
+
+**Q7**. Using the answer from A5 as a starting point, produce a summary table that has the following information for each recipient: \* count of contributions \* total amount of all contributions \* the average contribution amount \* the median contribution amount \* the smallest contribution amount \* the largest contribution amount
+
+Store it as a variable object called `wv_summary` so that you can examine it with the data viewer. What newsworthy nuggets jump out at you that you could imagine dropping into a news story? Write a few summary sentences with overall findings.
+
+**A7**.
+
+```{r}
+```
+View(wv_summary)
