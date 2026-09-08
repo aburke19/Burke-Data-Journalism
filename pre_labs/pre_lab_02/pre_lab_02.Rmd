@@ -357,4 +357,4 @@ So the month of June 2022 had the most expenditures by far in this data. We'll b
 
 Describe the values in the new `month` column - what do you think the data is showing here?
 
-**ANSWER:**
+**ANSWER:** The data is showing the months in order but not the years, which I find interesting.
