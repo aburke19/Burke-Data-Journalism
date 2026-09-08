@@ -65,7 +65,7 @@ primary_24 |>
 
 Describe what you think this code is doing below.
 
-**ANSWER:**
+**ANSWER:** I think the code is displaying the percent of election day and non-election day votes per candidate.
 
 ### Task 5: Better percentage calculation
 
