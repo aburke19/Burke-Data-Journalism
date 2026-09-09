@@ -113,8 +113,25 @@ wv_contributions |>
 
 Store it as a variable object called `wv_summary` so that you can examine it with the data viewer. What newsworthy nuggets jump out at you that you could imagine dropping into a news story? Write a few summary sentences with overall findings.
 
-**A7**.
+**A7**The data shows that the recipient received 40,441 contributions totaling $1,016,072. The average contribution was about $25.12, while the median contribution was $9.50, showing that many donations were relatively small. The difference between the average and median suggests that some larger donations increased the overall average. This could be newsworthy because it shows that the recipient received a large number of mostly small-dollar contributions, so I could look into why this might happen.
 
 ```{r}
+library(tidyverse)
+
+wv_contributions <- read_rds("lab_01.rds")
+
+wv_summary <- wv_contributions |>
+  group_by(fec_committee_id) |>
+  summarise(
+    contributions = n(),
+    total_amount = sum(amount),
+    average_contribution = mean(amount),
+    median_contribution = median(amount),
+    smallest_contribution = min(amount),
+    largest_contribution = max(amount)
+  ) |>
+  arrange(desc(total_amount))
+
+View(wv_summary)
 ```
 View(wv_summary)
