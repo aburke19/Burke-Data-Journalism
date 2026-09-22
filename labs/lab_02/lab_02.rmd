@@ -44,7 +44,7 @@ Which counties have seen the most? Take a look at county population figures here
 ```{r}
 new_voters <- md_voters_2024 |>
 filter(STATE_REGISTRATION_DATE == COUNTY_REGISTRATION_DATE) |>
-filter(COUNTY_REGISTRATION_DATE > mdy("07/21/2024"))
+filter(COUNTY_REGISTRATION_DATE > mdy("07/21/2024")
 
 nrow(new_voters)
 
