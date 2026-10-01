@@ -191,4 +191,12 @@ The column we're interested in, ZCTA5N, is a <dbl> column - it's a number.
 
 https://opendata.maryland.gov/Administrative/Zip-Code-Lookup-Table/ryxx-aeaf/about_data
 
+```{r}
+extra_data <- read_csv("data/extra_data.csv")
+```
+
+```{r}
+combined_data <- maryland_zcta |>
+  left_join(extra_data, join_by(ZCTA5N == 'Zip Code'))
+```
 
