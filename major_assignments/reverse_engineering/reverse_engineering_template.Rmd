@@ -1,7 +1,7 @@
 ---
 title: "Reverse Engineering Project"
-author: "Student names here"
-date: "Date here"
+author: "Alex Burke, Rory Cahill"
+date: "10/11/2026"
 output:
   html_document:
     theme: cerulean
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction 
 
-In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
+In this notebook, we are reverse engineering the story, [Millions in out-of-state donations help fuel high-profile Maryland Democratic governor candidates](https://cnsmaryland.org/2022/03/03/millions-in-out-of-state-donations-help-fuel-high-profile-maryland-democratic-governor-candidates/)
 
 ## Load libraries
 
@@ -34,6 +34,15 @@ In this section, describe the source of the data, write a basic data dictionary 
 
 ```{r}
 # Load required data
+library(readr)
+View(MD_gov_data_Moore_contribs)
+
+library(readr)
+View(MD_gov_data_Perez_contribs)
+
+library(readr)
+View(MD_gov_data_King_contribs)
+
 
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
 
@@ -47,15 +56,22 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 1
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: We are looking to answer the question of which who raised the most amount of money during the campaign in Maryland, as the article stated  “Moore raised the most money in Maryland out of all the candidates.”
+* **Analysis summary**: In order to confirm that Moore raised the most money in Maryland, we used the following code to sort how much money each candidate raised in the state of Maryland. Then we compared the answers to confirm that Moore raised the most with $1,736,656
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+MD_gov_data_Moore_contribs |>
+  filter(State == "Maryland")
+MD_gov_data_Perez_contribs |>
+  filter(State == "Maryland")
+MD_gov_data_King_contribs |>
+  filter(State == "Maryland")
 ```
+
+#Answer: 
+#Moore raised $1,736,656
+#Perez raised $762,794
+#King raised $238,527
 
 ### Sentence 2
 
