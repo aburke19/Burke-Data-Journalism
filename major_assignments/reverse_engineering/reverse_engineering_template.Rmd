@@ -91,27 +91,49 @@ filter(State == "California" | State == "New York" | State == "Illinois")
 
 ### Sentence 3
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: There is also a section of the reporting that John B. King raised more money for his campaign in California and New York than Maryland.
+
+* **Analysis summary**: This data raises a lot of questions about this candidate's levels of support in the state of Maryland. It shows the readers that a majority of his financial support actually comes from outside the state.
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+king_contribs <- read.csv("king_contribs.csv")
 ```
+
+```{r}
+king_contribs |>
+  arrange(desc(Amount.in..))
+```
+Results: King received $534,478 from New York and $252,098 from California
+
 
 ### Sentence 4
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: This report found that Moore “also raised over $1.3 million between New York and California.”
+* **Analysis summary**: Unfortunately, the final few lines of code did not work, for reasons we couldn't figure out, but are hoping to find a solution to get our results.
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+moore_contribs <- read.csv("moore_contribs.csv")
 ```
+
+```{r}
+moore_contribs |>
+  arrange(desc(Amount.in..))
+```
+
+```{r}
+ny_donations <- moore_contribs |>
+  filter(Amount.in..=="New York")
+```
+
+```{r}
+cali_donations <- moore_contribs |>
+  filter(Amount.in..=="California")
+```
+
+```{r}
+full_join (ny_donations,cali_donations,by = Amount.in..)
+```
+
 
 ### Sentence 5
 
