@@ -75,15 +75,19 @@ MD_gov_data_King_contribs |>
 
 ### Sentence 2
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: An analysis of campaign data by Capital News Service found other candidates in the Democratic primary similarly drew from the well of money from other states. Their campaigns were fattened with donations from Democratic strongholds like New York, California and Chicago, campaign finance records show.
+* **Analysis summary**: To show that the other two Democratic candidates raised a large amount of money from other states, we used this code to show how much campaign donations they received from heavily Democratic states.
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+MD_gov_data_Perez_contribs |>
+filter(State == "California" | State == "New York" | State == "Illinois")
+MD_gov_data_King_contribs |>
+filter(State == "California" | State == "New York" | State == "Illinois")
 ```
+
+#Answer
+#Perez: California = 382 contribs and $234,749, Illinois = 68 contribs and $28,497, New York = 214 contribs and $226,208
+#King: California = 668 contribs and %252,098, Illinois = 222 contribs and $125,055, New York = 867 contribs and $534,478
 
 ### Sentence 3
 
