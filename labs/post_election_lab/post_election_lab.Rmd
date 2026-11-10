@@ -63,7 +63,7 @@ texas_senate_2026_county_results <- read_csv("texas_senate_2026_county_results.c
 
 
 ```{r}
-texas_senate_2026_county_results <- texas_senate_2026_county_results %>%
+texas_senate_2026_county_results <- texas_senate_2026_county_results 
 mutate(winner_2026 = if_else(dem_margin_2026 > 0, "Democrat", "Republican"))
 ```
 
@@ -76,7 +76,7 @@ summarise(group_by(texas_senate_2026_county_results, winner_2026), average_margi
 **Task** Repeat those steps for 2024
 
 ```{r}
-texas_senate_2026_county_results <- texas_senate_2026_county_results %>%
+texas_senate_2026_county_results <- texas_senate_2026_county_results 
 mutate(winner_2024 = if_else(dem_margin_2024 > 0, "Democrat", "Republican"))
 ```
 
