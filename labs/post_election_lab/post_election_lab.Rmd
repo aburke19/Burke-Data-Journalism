@@ -66,6 +66,8 @@ texas_senate_2026_county_results <- read_csv("texas_senate_2026_county_results.c
 texas_senate_2026_county_results <- texas_senate_2026_county_results 
 mutate(winner_2026 = if_else(dem_margin_2026 > 0, "Democrat", "Republican"))
 ```
+#create winner_2026 and inside of it: if dem_margin_2026 is > 0 make the value"democrat", else make it "republican"
+
 
 **Task** Based on those categories, calculate the average margins in the counties that the Democrat won, and the average margin in the counties that the Republican won.
 
