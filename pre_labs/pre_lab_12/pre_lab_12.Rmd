@@ -1,0 +1,346 @@
+---
+title: "pre_lab_12.Rmd"
+author: "Derek Willis, updated by Aidan Hughes"
+date: "2026-11-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# An intro to text analysis
+
+Throughout this course, we've been focused on finding information in structured data. We've learned a lot of techniques to do that, and we've learned how the creative mixing and matching of those skills can find new insights.
+
+What happens when the insights are in unstructured data? Like a block of text?
+
+Turning unstructured text into data to analyze is a whole course in and of itself -- and one worth taking if you've got the credit hours -- but some simple stuff is in the grasp of basic data analysis.
+
+To do this, we'll need a new library -- [tidytext](https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html), which you can guess by the name plays very nicely with the tidyverse. So install it in the console with `install.packages("tidytext")` and we'll get rolling.
+
+### Task 1: Load libraries and settings
+
+**Task** Run the following code in the gray-colored codeblock below to load the libraries we'll use.
+
+```{r}
+#install.packages("tidytext")
+library(tidyverse)
+library(tidytext)
+```
+
+For this lesson, we'll analyze excerpts from the 2024 Republican and Democratic party platforms -- the documents each party adopted at its national convention laying out its priorities. We've trimmed each one down to a few hundred-word sections covering the same four topics (immigration, the economy, energy and healthcare), so the two are a fair comparison in size, and saved the text locally in a CSV so there's no need to scrape anything from the web. Our starting question: since both parties are writing about the same topics, what words or phrases show up most in each platform, and what does that reveal about how each party frames the same issues?
+
+### Task 2: Read in data
+
+**Task** Run the following code and describe the dataframe it outputs. **Answer**
+
+```{r}
+platforms <- read_csv("data/platforms.csv")
+
+platforms
+```
+
+Each row in `platforms` is one party's platform excerpt, with a `party`, `title`, `date` and a `text` column holding that excerpt as one block of text.
+
+What we want to do is make that `text` column easier to analyze. If you are trying to create a list of unique words, R will treat differences in capitalization as unique and also will include punctuation by default, even using its `unique` function:
+
+### Task 3: Trying out unique
+
+**Task** Run the following code and describe what the `unique` function does to the original list of words. **Answer**
+
+```{r}
+a_list_of_words <- c("Dog", "dog", "dog", "cat", "cat", ",")
+unique(a_list_of_words)
+```
+
+Fortunately, this is a solved problem with tidytext, which has a function called `unnest_tokens` that will convert the text to lowercase and remove all punctuation. The way that `unnest_tokens` works is that we tell it what we want to call the field we're creating with this breaking apart (we'll call it "word"), then we tell it what we're breaking apart -- what field has all the text in it (the "text" column).
+
+### Task 4: Trying out unnest_tokens
+
+**Task** Run the following code and describe the output of using the `unnest_tokens` function. **Answer**
+
+```{r}
+unique_words <- platforms |> select(text) |>
+  unnest_tokens(word, text)
+View(unique_words)
+```
+
+### Task 5: Find the top words
+
+**Task** 
+
+Now we can look at the top words across both platforms combined. Let's limit ourselves to the top 25 words. We'll use `group_by` and `summarize` to do the counting, the same way we have in earlier labs:
+
+```{r}
+unique_words |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  top_n(25)
+```
+
+Well, that's a bit underwhelming - a lot of very common (and short) words. This also is a solved problem in working with text data, and words like "a" and "the" are known as "stop words". In most cases you'll want to remove them from your analysis since they are so common. Tidytext provides a dataframe of them that we'll load, and then we'll add some of our own.
+
+### Task 6: Load the stop words
+
+**Task** Run the following code
+
+```{r}
+data("stop_words")
+
+view(stop_words)
+```
+
+```{r}
+stop_words <- stop_words |>
+  add_row(word = "united") |>
+  add_row(word = "nation") |>
+  add_row(word = "nations") |>
+  add_row(word = "america") |>
+  add_row(word = "american") |>
+  add_row(word = "americans")
+```
+
+### Task 7: Using anti_join
+
+Then we're going to use a function we haven't used yet called an `anti_join`, which takes two data sets and only keeps rows where there AREN'T any matches. So we'll `anti_join` the stop words and get a list of words that aren't stop words.
+
+From there, we can get a simple word frequency by just grouping them together and summarizing a count, same as before. We can add a percent code to get a percent of the words our top 10 words represent.
+
+**Task** Run the following code and describe the results. Is it more interesting than before?
+
+```{r}
+unique_words |>
+  anti_join(stop_words) |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100) |>
+  top_n(10)
+```
+
+Those seem like more relevant unique words. Now, here's where we can start to do more interesting and meaningful analysis. Let's create two dataframes of unique words, one for each party's platform, so we can compare them directly:
+
+### Task 8: Create dataframes for each platform
+
+**Task** Run the following code
+
+```{r}
+unique_words_rep <- platforms |>
+  filter(party == "Republican") |>
+  select(text) |>
+  unnest_tokens(word, text)
+
+unique_words_dem <- platforms |>
+  filter(party == "Democratic") |>
+  select(text) |>
+  unnest_tokens(word, text)
+```
+
+Here we're filtering on `party`, since each row in `platforms` was written by a different party.
+
+Then we can create top 10 lists for both of them and compare:
+
+### Task 9: Create dataframes with the top 10 words in each platform
+
+**Task** Run the following code and describe the results. **Answer**
+
+```{r}
+unique_words_rep |>
+  anti_join(stop_words) |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100) |>
+  top_n(10)
+
+unique_words_dem |>
+  anti_join(stop_words) |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100) |>
+  top_n(10)
+```
+
+The Republican platform's top words -- "republicans," "energy," "border," "illegal," "inflation" -- read like a policy checklist. The Democratic platform's list includes plenty of policy words too ("energy," "jobs," "affordable," "care," "climate"), but also "trump": the Democratic excerpt names Trump 10 times, while the Republican excerpt only names Biden a handful of times and mostly refers to "Democrats" collectively. Just counting words already surfaces a real difference in how each party frames its message.
+
+## Going beyond a single word
+
+The next step in text analysis is using `ngrams`. An `ngram` is any combination of words that you specify. Two word ngrams are called bigrams (bi-grams). Three would be trigrams. And so forth.
+
+### Task 10: Create a dataframe with the top two-word phrases for the Republican platform
+
+1.  Use the platforms data we created earlier, and filter for just the Republican platform.
+2.  Unnest the tokens again, but instead we're going to create a field called bigram, break apart text, but we're going to specify the tokens in this case are ngrams of 2.
+
+```{r}
+platforms |>
+  filter(party == "Republican") |>
+  unnest_tokens(bigram, text, token = "ngrams", n = 2)
+```
+
+Now let's add more steps. This block is going to do the following:
+
+3.  We're going to make things easier to read and split bigrams into word1 and word2.
+4.  We're going to filter out stopwords again, using `anti_join` just like before, but this time once for word1 and once for word2.
+5.  Put bigram back together again, now that the stop words are gone.
+6.  We'll then group by, summarize a count and create a percent just like we did above.
+
+```{r}
+platforms |>
+  filter(party == "Republican") |>
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) |>
+  # separate() splits the "bigram" column into two new columns, "word1" and "word2",
+  # using the space between the two words (sep = " ") as the dividing point
+  separate(bigram, c("word1", "word2"), sep = " ") |>
+  #Get rid of the rows where word1 is a stop word
+  anti_join(stop_words, by = c("word1" = "word")) |>
+  #Get rid of the rows where word2 is a stop word
+  anti_join(stop_words, by = c("word2" = "word")) |>
+  mutate(bigram = paste(word1, word2, sep=" ")) |>
+  group_by(bigram) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100)
+```
+
+And we already have a different result -- "illegal aliens," "energy production" etc. show up front and center. What about the Democratic platform?
+
+### Task 11: Create a dataframe with the top two-word phrases for the Democratic platform
+
+**Task** Run the following code and describe the results. **Answer**
+
+```{r}
+platforms |>
+  filter(party == "Democratic") |>
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) |>
+  separate(bigram, c("word1", "word2"), sep = " ") |>
+  anti_join(stop_words, by = c("word1" = "word")) |>
+  anti_join(stop_words, by = c("word2" = "word")) |>
+  mutate(bigram = paste(word1, word2, sep=" ")) |>
+  group_by(bigram) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100)
+```
+
+Here we get phrases like "clean energy," "affordable care" and "broken immigration" -- some of the same topics, described in very different terms than the Republican platform used. You'll notice that the percentages are very small; that's not irrelevant but in some cases it's the differences in patterns that's more important.
+
+There are some potential challenges to doing an analysis. For one, there are variations of words that could probably be standardized - maybe using OpenRefine - that would give us cleaner results. There might be some words among our list of stop words that actually are meaningful in this context.
+
+Or..... we could have R tackle this.
+
+### Task 12: Install a package for stemming and lemmatizing words
+
+**Task** Run the following code.
+
+```{r}
+install.packages("pacman") # comment this line out after you run it the first time
+pacman::p_load_gh("trinker/textstem")
+library(textstem)
+```
+
+[textstem](https://github.com/trinker/textstem) is a library that has two functions: stemming and lemmatization. What are they? Both of them convert a set of words or phrases into different forms, but the differences are worth seeing:
+
+### Task 13: Stemming vs. Lemmatization
+
+**Task** Run the following code and describe the differences between the two results. Which one might be more useful for the platform text? **Answer**
+
+```{r}
+dw <- c('driver', 'drive', 'drove', 'driven', 'drives', 'driving')
+```
+
+```{r}
+stem_words(dw)
+```
+
+
+```{r}
+lemmatize_words(dw)
+```
+
+
+Here's a breakdown of the difference between the two:
+
+geeksforgeeks.org/nlp/lemmatization-vs-stemming/
+
+Let's try lemmatization on the Democratic platform's unique words, and then compare the top ten to the original top ten from Task 9:
+
+### Task 14: Stemming vs. Lemmatization vs. Words
+
+**Task** Run the following code and describe the differences between the three results.
+
+```{r}
+unique_words_dem |>
+  anti_join(stop_words) |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100)
+```
+
+
+```{r}
+unique_words_dem_stem <- stem_words(unique_words_dem$word) |> as_tibble() |> rename(word = value)
+
+unique_words_dem_stem |>
+  anti_join(stop_words) |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100)
+```
+
+
+```{r}
+unique_words_dem_lemma <- unique_words_dem |>
+mutate(word = lematize_words(word)) |>
+rename(word = value)
+
+unique_words_dem_lemma |>
+  anti_join(stop_words) |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  arrange(desc(n)) |>
+  mutate(percent = (n/sum(n))*100)
+```
+
+
+## Sentiment Analysis
+
+Another popular use of text analysis is to measure the sentiment of a word - whether it expresses a positive or negative idea - and tidytext has built-in tools to make that possible. We use word counts like we've already calculated and bring in a dataframe of words (called a lexicon) along with their sentiments using a function called `get_sentiments`. The most common dataframe is called "bing" which has nothing to do with the Microsoft search engine. Let's load it:
+
+### Task 15: Load the bing lexicon and produce sentiments for both platforms
+
+**Task** Run the following code and describe the results. Do any of the sentiments seem incorrect or counter-intuitive? **Answer**
+
+```{r}
+bing <- get_sentiments("bing")
+
+view(bing)
+```
+
+```{r}
+bing_word_counts_rep <- unique_words_rep |>
+  inner_join(bing) |>
+  group_by(word, sentiment) |>
+  summarize(n = n()) |>
+  arrange(desc(n))
+
+View(bing_word_counts_rep)
+```
+
+
+```{r}
+bing_word_counts_dem <- unique_words_dem |>
+  inner_join(bing) |>
+  group_by(word, sentiment) |>
+  summarize(n = n()) |>
+  arrange(desc(n))
+
+View(bing_word_counts_dem)
+```
+
+Gauging the sentiment of a word can be heavily dependent on the context, and as with other types of text analysis sometimes larger patterns are more meaningful than individual results. But the potential with text analysis is vast: knowing what words and phrases that political parties employ can be a way to evaluate their priorities, cohesiveness and tactics for persuading voters.
