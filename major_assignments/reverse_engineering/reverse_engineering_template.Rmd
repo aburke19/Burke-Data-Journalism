@@ -25,7 +25,7 @@ In this notebook, we are reverse engineering the story, [Millions in out-of-stat
 Loading required libraries for this analysis.
 
 ```{r echo=FALSE, message=FALSE}
-
+library(tidyverse)
 ```
 
 ## Load and Cleaning Data
@@ -96,12 +96,8 @@ filter(State == "California" | State == "New York" | State == "Illinois")
 * **Analysis summary**: This data raises a lot of questions about this candidate's levels of support in the state of Maryland. It shows the readers that a majority of his financial support actually comes from outside the state.
 
 ```{r}
-king_contribs <- read.csv("king_contribs.csv")
-```
-
-```{r}
-king_contribs |>
-  arrange(desc(Amount.in..))
+MD_gov_data_King_contribs |>
+arrange(desc("Amount in $"))
 ```
 Results: King received $534,478 from New York and $252,098 from California
 
@@ -112,28 +108,16 @@ Results: King received $534,478 from New York and $252,098 from California
 * **Analysis summary**: Unfortunately, the final few lines of code did not work, for reasons we couldn't figure out, but are hoping to find a solution to get our results.
 
 ```{r}
-moore_contribs <- read.csv("moore_contribs.csv")
+MD_gov_data_Moore_contribs |>
+filter(State == "New York" | State == "California") |>
+group_by(State) |>
+summarise(
+Contributions = n(),
+Total = sum(`Amount in $`)
+)
 ```
 
-```{r}
-moore_contribs |>
-  arrange(desc(Amount.in..))
-```
-
-```{r}
-ny_donations <- moore_contribs |>
-  filter(Amount.in..=="New York")
-```
-
-```{r}
-cali_donations <- moore_contribs |>
-  filter(Amount.in..=="California")
-```
-
-```{r}
-full_join (ny_donations,cali_donations,by = Amount.in..)
-```
-
+#Moore raised $1,000,665 in New York and $326,990 in California, $1.3 million in total
 
 ### Sentence 5
 
